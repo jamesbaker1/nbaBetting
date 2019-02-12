@@ -16,7 +16,7 @@ game_results["Date"] = game_results["Date"].dt.strftime('%m%d%Y')
 team_stats["DATE"] = team_stats["DATE"].astype(int)
 game_results["Date"] = game_results["Date"].astype(int)
 #  Need the day before stats!
-team_stats["DATE"] = team_stats["DATE"] - 10000
+team_stats["DATE"] = team_stats["DATE"] + 10000
 
 
 # print(game_results.head())
@@ -26,24 +26,42 @@ team_stats["DATE"] = team_stats["DATE"] - 10000
 
 
 # print(game_results.head())
-count = 0
+end_dataframe_cols = ['HOME_TEAM_NAME', 'HOME_DATE', 'HOME_W_PCT', 'HOME_FG_PCT', 'HOME_FG3_PCT', 'HOME_OREB', 'HOME_DREB', 'HOME_AST', 'HOME_TOV', 'HOME_STL', 'HOME_BLK', 'HOME_PTS', 'AWAY_TEAM_NAME', 'AWAY_DATE', 'AWAY_W_PCT', 'AWAY_FG_PCT', 'AWAY_FG3_PCT', 'AWAY_OREB', 'AWAY_DREB', 'AWAY_AST', 'AWAY_TOV','AWAY_STL', 'AWAY_BLK', 'AWAY_PTS', "Home Team Wins"]
+end_dataframe_rows = []
+# count = 0
 for index, row in game_results.iterrows():
-    if count > 20:
-        break
     home_team_stats = team_stats[(team_stats['TEAM_NAME'] == row["Home/Neutral"]) & (team_stats["DATE"] == row["Date"])]
-    print(home_team_stats)
-
-    home_team_stats = home_team_stats[["W_PCT", "FG_PCT", "FG3_PCT", "OREB", "DREB", "AST", "TOV", "STL", "BLK", "PTS"]]
+    home_team_stats = home_team_stats[["TEAM_NAME", "DATE","W_PCT", "FG_PCT", "FG3_PCT", "OREB", "DREB", "AST", "TOV", "STL", "BLK", "PTS"]]
     home_team_stats.rename(columns=lambda x: "HOME_" + x, inplace=True)
 
     away_team_stats = team_stats[(team_stats['TEAM_NAME'] == row["Visitor/Neutral"]) & (team_stats["DATE"]== row["Date"])]
-    away_team_stats = home_team_stats[["W_PCT", "FG_PCT", "FG3_PCT", "OREB", "DREB", "AST", "TOV", "STL", "BLK", "PTS"]]
+    away_team_stats = away_team_stats[["TEAM_NAME","DATE","W_PCT", "FG_PCT", "FG3_PCT", "OREB", "DREB", "AST", "TOV", "STL", "BLK", "PTS"]]
     away_team_stats.rename(columns=lambda x: "AWAY_" + x, inplace=True)
+    # print(home_team_stats.iloc(0)[0])
+    if (home_team_stats.shape[0] > 0) and (away_team_stats.shape[0] > 0):
+        temp_list = []
+        temp_list.extend(home_team_stats.values.tolist()[0])
+        temp_list.extend(away_team_stats.values.tolist()[0])
+        temp_list.append(row["Home Team Wins"])
+        end_dataframe_rows.append(temp_list)
+        # print(end_dataframe_cols)
+        # print(end_dataframe_rows)
+        # print(len(end_dataframe_cols) == len(end_dataframe_rows[0]))
+        # break
 
-    print(home_team_stats)
+
+    # print(home_team_stats.columns)
+    # print(away_team_stats.columns)
+    # if count > 20:
+    #     print(home_team_stats)
+    #     break
+    # count += 1
+df = pd.DataFrame(end_dataframe_rows,columns=end_dataframe_cols)
+# print(df)
+# print(df.shape)
+df.to_csv("the_dataaaa.csv")
     # print(away_team_stats)
     # home_team_stats = home_team_stats[["Date","Visitor/Neutral", "Home/Neutral","PTS","PTS.1"]]
-    break
     # away_team_stats = team_stats[team_stats['C']>1]
 # print(game_results.iloc(0)[0][0])
 # print(team_stats.head())
